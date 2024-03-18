@@ -1,13 +1,28 @@
 cmake_minimum_required(VERSION 3.19)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+project(qemu-hijack-example VERSION 0.0.0.0 LANGUAGES C CXX)
 
-project(player VERSION 0.0.0.0 LANGUAGES C CXX)
+if(NOT DEFINED CMAKE_RUNTIME_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+endif()
 
-file(GLOB_RECURSE _src src/*.h src/*.c src/*.cpp)
-add_executable(${PROJECT_NAME} ${_src})
+if(NOT DEFINED CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
 
-find_package(SDL2 CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE SDL2::SDL2)
+if(NOT DEFINED CMAKE_ARCHIVE_OUTPUT_DIRECTORY)
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE SDL_MAIN_HANDLED)
+if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /manifest:no")
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} /manifest:no")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /manifest:no")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8")
+
+    if(NOT DEFINED CMAKE_DEBUG_POSTFIX)
+        set(CMAKE_DEBUG_POSTFIX "d")
+    endif()
+endif()
+
+add_subdirectory(src)

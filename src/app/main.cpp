@@ -3,7 +3,10 @@
 #include <iostream>
 #include <fstream>
 
-#include <SDL2/SDL.h>
+#include <fakesdl.h>
+
+// #include <SDL_audio.h>
+// #include <SDL.h>
 
 namespace {
 
@@ -98,7 +101,23 @@ static void read_audio_data(void *udata, Uint8 *stream, int len) {
     args->unlock();
 }
 
+static inline long syscall_with_pointer_arg(uint64_t syscall_number, void *arg) {
+    long ret;
+    __asm__ volatile("movq %1, %%rax\n\t"            // 加载系统调用号到 rax
+                     "movq %2, %%rdi\n\t"            // 加载参数到 rdi
+                     "syscall\n\t"                   // 执行系统调用
+                     "movq %%rax, %0\n\t"            // 将返回值存储在 ret 中
+                     : "=r"(ret)                     // 输出列表
+                     : "r"(syscall_number), "r"(arg) // 输入列表
+                     : "%rax", "%rdi", "memory"      // 被改变的寄存器列表
+    );
+    return ret;
+}
+
 int main(int argc, char *argv[]) {
+    auto magic = syscall_with_pointer_arg(114514, nullptr);
+    printf("MAGIC: %ld\n", magic);
+
     if (argc < 2) {
         printf("Usage: %s <audio file>\n", argv[0]);
         return 0;
@@ -182,8 +201,10 @@ int main(int argc, char *argv[]) {
 
     printf("\n");
 
+#define BUF_SIZE 4096
+
     SDLPlaybackData args;
-    args.buf_size = 4096;
+    args.buf_size = BUF_SIZE;
     args.fmt = AUDIO_S16SYS;
 
     // 播放
@@ -197,7 +218,7 @@ int main(int argc, char *argv[]) {
     spec.callback = read_audio_data;
     spec.userdata = &args;
 
-    auto pcm_buffer = new char[args.buf_size];
+    char pcm_buffer[BUF_SIZE];
     args.audio_chunk = reinterpret_cast<uint8_t *>(pcm_buffer);
 
 #define USE_DEFAULT_DEVICE 0
@@ -287,8 +308,6 @@ int main(int argc, char *argv[]) {
 
         SDL_Delay(1);
     }
-
-    delete[] pcm_buffer;
 
     SDL_CloseAudioDevice(id);
     SDL_Quit();
