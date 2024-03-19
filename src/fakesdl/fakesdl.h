@@ -8,7 +8,10 @@
 extern "C" {
 #endif
 
+#ifndef DECLSPEC
 #define DECLSPEC __attribute__((visibility("default")))
+#endif
+
 #define SDLCALL
 
 //===========================================================================

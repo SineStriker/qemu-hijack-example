@@ -101,22 +101,12 @@ static void read_audio_data(void *udata, Uint8 *stream, int len) {
     args->unlock();
 }
 
-static inline long syscall_with_pointer_arg(uint64_t syscall_number, void *arg) {
-    long ret;
-    __asm__ volatile("movq %1, %%rax\n\t"            // 加载系统调用号到 rax
-                     "movq %2, %%rdi\n\t"            // 加载参数到 rdi
-                     "syscall\n\t"                   // 执行系统调用
-                     "movq %%rax, %0\n\t"            // 将返回值存储在 ret 中
-                     : "=r"(ret)                     // 输出列表
-                     : "r"(syscall_number), "r"(arg) // 输入列表
-                     : "%rax", "%rdi", "memory"      // 被改变的寄存器列表
-    );
-    return ret;
-}
-
 int main(int argc, char *argv[]) {
-    auto magic = syscall_with_pointer_arg(114514, nullptr);
-    printf("MAGIC: %ld\n", magic);
+    {
+        SDL_version ver;
+        SDL_GetVersion(&ver);
+        printf("SDL Version: %d %d %d\n", ver.major, ver.minor, ver.patch);
+    }
 
     if (argc < 2) {
         printf("Usage: %s <audio file>\n", argv[0]);

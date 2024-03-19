@@ -1,0 +1,10 @@
+project(fakesdl2 LANGUAGES C CXX)
+
+file(GLOB_RECURSE _src *.h *.c *.cpp)
+add_library(${PROJECT_NAME} SHARED ${_src})
+
+target_link_libraries(${PROJECT_NAME} PRIVATE dl)
+
+target_include_directories(${PROJECT_NAME} PUBLIC .)
+
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
