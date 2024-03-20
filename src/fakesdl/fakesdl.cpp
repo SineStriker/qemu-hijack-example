@@ -67,14 +67,14 @@ namespace {
             printf("Library Handle: %p\n", dll);
 
 #define API_HELPER(NAME)                                                                           \
-    {                                                                                              \
-        p##NAME = reinterpret_cast<decltype(p##NAME)>(qge_GetProcAddress(dll, "my_" #NAME));       \
-        if (!p##NAME) {                                                                            \
-            printf("FakeSDL: API %s cannot be resolved!\n", #NAME);                                \
-            std::abort();                                                                          \
-        }                                                                                          \
-        printf("Resolve %s: %p\n", #NAME, p##NAME);                                                \
-    }
+  {                                                                                                \
+    p##NAME = reinterpret_cast<decltype(p##NAME)>(qge_GetProcAddress(dll, "my_" #NAME));           \
+    if (!p##NAME) {                                                                                \
+      printf("FakeSDL: API %s cannot be resolved!\n", #NAME);                                      \
+      std::abort();                                                                                \
+    }                                                                                              \
+    printf("Resolve %s: %p\n", #NAME, p##NAME);                                                    \
+  }
 
             API_HELPER(SDL_memset);
             API_HELPER(SDL_Init);
@@ -116,22 +116,16 @@ namespace {
 }
 
 void *SDL_memset(void *dst, int c, size_t len) {
-    void *a[] = {
-        to_ptr(dst),
-        to_ptr(c),
-        to_ptr(len),
-    };
-    void *ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_memset, a, &ret);
+    auto ret = create_empty_ret(SDL_memset);
+    auto a = get_addresses_of_parameters(dst, c, len);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_memset, a.data(), &ret);
     return ret;
 }
 
 int SDL_Init(Uint32 flags) {
-    void *a[] = {
-        to_ptr(flags),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_Init, a, &ret);
+    auto ret = create_empty_ret(SDL_Init);
+    auto a = get_addresses_of_parameters(flags);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_Init, a.data(), &ret);
     return ret;
 }
 
@@ -140,31 +134,24 @@ void SDL_Quit(void) {
 }
 
 void SDL_Delay(Uint32 ms) {
-    void *a[] = {
-        to_ptr(ms),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_Delay, a, nullptr);
+    auto a = get_addresses_of_parameters(ms);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_Delay, a.data(), nullptr);
 }
 
 const char *SDL_GetError(void) {
-    char *ret{};
+    auto ret = create_empty_ret(SDL_GetError);
     qge_CallNativeProc(DynamicApis::instance().pSDL_GetError, nullptr, &ret);
     return ret;
 }
 
 void SDL_GetVersion(SDL_version *ver) {
-    void *a[] = {
-        to_ptr(ver),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_GetVersion, a, nullptr);
+    auto a = get_addresses_of_parameters(ver);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_GetVersion, a.data(), nullptr);
 }
 
 void SDL_LogSetPriority(int category, SDL_LogPriority priority) {
-    void *a[] = {
-        to_ptr(category),
-        to_ptr(priority),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_LogSetPriority, a, nullptr);
+    auto a = get_addresses_of_parameters(category, priority);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_LogSetPriority, a.data(), nullptr);
 }
 
 void SDL_LogError(int category, const char *fmt, ...) {
@@ -174,142 +161,110 @@ void SDL_Log(SDL_PRINTF_FORMAT_STRING const char *fmt, ...) {
 }
 
 SDL_mutex *SDL_CreateMutex(void) {
-    SDL_mutex *ret{};
+    auto ret = create_empty_ret(SDL_CreateMutex);
     qge_CallNativeProc(DynamicApis::instance().pSDL_CreateMutex, nullptr, &ret);
     return ret;
 }
 
 void SDL_DestroyMutex(SDL_mutex *mutex) {
-    void *a[] = {
-        to_ptr(mutex),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_DestroyMutex, a, nullptr);
+    auto a = get_addresses_of_parameters(mutex);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_DestroyMutex, a.data(), nullptr);
 }
 
 int SDL_LockMutex(SDL_mutex *mutex) {
-    void *a[] = {
-        to_ptr(mutex),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_LockMutex, a, &ret);
+    auto ret = create_empty_ret(SDL_LockMutex);
+    auto a = get_addresses_of_parameters(mutex);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_LockMutex, a.data(), &ret);
     return ret;
 }
 
 int SDL_UnlockMutex(SDL_mutex *mutex) {
-    void *a[] = {
-        to_ptr(mutex),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_UnlockMutex, a, &ret);
+    auto ret = create_empty_ret(SDL_UnlockMutex);
+    auto a = get_addresses_of_parameters(mutex);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_UnlockMutex, a.data(), &ret);
     return ret;
 }
 
 int SDL_PushEvent(SDL_Event *event) {
-    void *a[] = {
-        to_ptr(event),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_PushEvent, a, &ret);
+    auto ret = create_empty_ret(SDL_PushEvent);
+    auto a = get_addresses_of_parameters(event);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_PushEvent, a.data(), &ret);
     return ret;
 }
 
 int SDL_PollEvent(SDL_Event *event) {
-    void *a[] = {
-        to_ptr(event),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_PollEvent, a, &ret);
+    auto ret = create_empty_ret(SDL_PollEvent);
+    auto a = get_addresses_of_parameters(event);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_PollEvent, a.data(), &ret);
     return ret;
 }
 
 void SDL_MixAudioFormat(Uint8 *dst, const Uint8 *src, SDL_AudioFormat format, Uint32 len,
                         int volume) {
-    void *a[] = {
-        to_ptr(dst), to_ptr(src), to_ptr(format), to_ptr(len), to_ptr(volume),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_MixAudioFormat, a, nullptr);
+    auto a = get_addresses_of_parameters(dst, src, format, len, volume);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_MixAudioFormat, a.data(), nullptr);
 }
 
 int SDL_GetNumAudioDevices(int iscapture) {
-    void *a[] = {
-        to_ptr(iscapture),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_GetNumAudioDevices, a, &ret);
+    auto ret = create_empty_ret(SDL_GetNumAudioDevices);
+    auto a = get_addresses_of_parameters(iscapture);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_GetNumAudioDevices, a.data(), &ret);
     return ret;
 }
 
 const char *SDL_GetAudioDeviceName(int index, int iscapture) {
-    void *a[] = {
-        to_ptr(index),
-        to_ptr(iscapture),
-    };
-    char *ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_GetAudioDeviceName, a, &ret);
+    auto ret = create_empty_ret(SDL_GetAudioDeviceName);
+    auto a = get_addresses_of_parameters(index, iscapture);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_GetAudioDeviceName, a.data(), &ret);
     return ret;
 }
 
 int SDL_OpenAudio(SDL_AudioSpec *desired, SDL_AudioSpec *obtained) {
-    void *a[] = {
-        to_ptr(desired),
-        to_ptr(obtained),
-    };
-    int ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_OpenAudio, a, &ret);
+    auto ret = create_empty_ret(SDL_OpenAudio);
+    auto a = get_addresses_of_parameters(desired, obtained);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_OpenAudio, a.data(), &ret);
     return ret;
 }
 
 SDL_AudioDeviceID SDL_OpenAudioDevice(const char *device, int iscapture,
                                       const SDL_AudioSpec *desired, SDL_AudioSpec *obtained,
                                       int allowed_changes) {
-    void *a[] = {
-        to_ptr(device),   to_ptr(iscapture),       to_ptr(desired),
-        to_ptr(obtained), to_ptr(allowed_changes),
-    };
-    SDL_AudioDeviceID ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_OpenAudioDevice, a, &ret);
+    auto ret = create_empty_ret(SDL_OpenAudioDevice);
+    auto a = get_addresses_of_parameters(device, iscapture, desired, obtained, allowed_changes);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_OpenAudioDevice, a.data(), &ret);
     return ret;
 }
 
 int SDL_GetNumAudioDrivers(void) {
-    int ret{};
+    auto ret = create_empty_ret(SDL_GetNumAudioDrivers);
     qge_CallNativeProc(DynamicApis::instance().pSDL_GetNumAudioDrivers, nullptr, &ret);
     return ret;
 }
 
 const char *SDL_GetAudioDriver(int index) {
-    void *a[] = {
-        to_ptr(index),
-    };
-    char *ret{};
-    qge_CallNativeProc(DynamicApis::instance().pSDL_GetAudioDriver, a, &ret);
+    auto ret = create_empty_ret(SDL_GetAudioDriver);
+    auto a = get_addresses_of_parameters(index);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_GetAudioDriver, a.data(), &ret);
     return ret;
 }
 
 const char *SDL_GetCurrentAudioDriver(void) {
-    char *ret{};
+    auto ret = create_empty_ret(SDL_GetCurrentAudioDriver);
     qge_CallNativeProc(DynamicApis::instance().pSDL_GetCurrentAudioDriver, nullptr, &ret);
     return ret;
 }
 
 void SDL_PauseAudio(int pause_on) {
-    void *a[] = {
-        to_ptr(pause_on),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_PauseAudio, a, nullptr);
+    auto a = get_addresses_of_parameters(pause_on);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_PauseAudio, a.data(), nullptr);
 }
 
 void SDL_PauseAudioDevice(SDL_AudioDeviceID dev, int pause_on) {
-    void *a[] = {
-        to_ptr(dev),
-        to_ptr(pause_on),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_PauseAudioDevice, a, nullptr);
+    auto a = get_addresses_of_parameters(dev, pause_on);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_PauseAudioDevice, a.data(), nullptr);
 }
 
 void SDL_CloseAudioDevice(SDL_AudioDeviceID dev) {
-    void *a[] = {
-        to_ptr(dev),
-    };
-    qge_CallNativeProc(DynamicApis::instance().pSDL_CloseAudioDevice, a, nullptr);
+    auto a = get_addresses_of_parameters(dev);
+    qge_CallNativeProc(DynamicApis::instance().pSDL_CloseAudioDevice, a.data(), nullptr);
 }

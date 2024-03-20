@@ -5,3 +5,5 @@ add_library(${PROJECT_NAME} SHARED ${_src})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE qemu-guest-entry)
 target_include_directories(${PROJECT_NAME} PUBLIC .)
+
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)

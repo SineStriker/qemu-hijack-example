@@ -126,7 +126,6 @@ void my_SDL_GetError(void *args, void *ret) {
     call_function2(DynamicApis::instance().pSDL_GetError, (void **) args, ret);
 }
 void my_SDL_GetVersion(void *args, void *ret) {
-    printf("CALLED!!!!!!!!!!!!!\n");
     call_function2(DynamicApis::instance().pSDL_GetVersion, (void **) args, ret);
 }
 void my_SDL_LogSetPriority(void *args, void *ret) {
